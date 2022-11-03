@@ -1,13 +1,13 @@
 MODULE RDF_3D
         IMPLICIT NONE
+        INTEGER :: rdf3_dr, num_ref_atom, num_obs_atom
+        REAL :: r_max, r_min
         CONTAINS
 !******************************************************************************!
         SUBROUTINE get_infos_rdf3d(ATOM_NAME, n_atoms)
                 IMPLICIT NONE
                 INTEGER :: c, i
                 INTEGER, INTENT(IN) :: n_atoms
-                INTEGER :: rdf3_dr, num_ref_atom, num_obs_atom
-                REAL :: r_max, r_min
                 INTEGER, ALLOCATABLE, DIMENSION(:) :: RES_TEST, REF_LOC, OBS_LOC
                 CHARACTER(LEN = 10) :: rdf3_name1, rdf3_name2
                 CHARACTER(LEN = 10), DIMENSION(n_atoms) :: ATOM_NAME
@@ -52,6 +52,43 @@ MODULE RDF_3D
 
         END SUBROUTINE get_infos_rdf3d
 
+!******************************************************************************!
+        DOUBLE PRECISION FUNCTION RDF3D(name_p1, name_p2, Posref, Posobs) !RESULT (bound) 
+        
+                USE MD_STUFF
+                !https://physics.emory.edu/faculty/weeks/idl/gofr2.html
+        
+                IMPLICIT NONE
+                INTEGER :: i, j, k
+                DOUBLE PRECISION, DIMENSION(11) :: bound
+                CHARACTER(LEN = 10), INTENT(IN) :: name_p1, name_p2
+                DOUBLE PRECISION, DIMENSION(num_ref_atom) :: Posref
+                DOUBLE PRECISION, DIMENSION(num_obs_atom) :: Posobs
+                !** Definition of bound **!
+                !-------------------------!
+                bound(1) = r_min
+                DO k = 1, rdf3_dr
+                        bound(j+1) = r_min + j*((r_max - r_min)/rdf3_dr)
+                END DO
+                !-------------------------!
+        
+!                DO i = 1, num_p1 ! Loop over all the ref. atoms
+!                        DO j = 1, num_p2 ! Loop over the observed atoms
+!        
+!                                ! call pbc to change X, Y and Z positions
+!                                X = dist_PBC(Posobs(j, 1), Posref(i, 1), boxx)
+!                                Y = dist_PBC(Posobs(j, 2), Posref(i, 2), boxy)
+!                                Z = dist_PBC(Posobs(j, 3), Posref(i, 3), boxz)
+!        
+!                                ! compute distance ref - obs (with pbc)
+!                                d_ref_obs = sqrt( X**2 + Y**2 + Z**2 )
+!                        
+!                                !IF (d_ref_obs <= rmax) THEN
+!                                !placer dans le bon bin
+!        
+!                        END DO
+!                END DO
+        END FUNCTION RDF3D  
 !******************************************************************************!
         
 END MODULE RDF_3D
