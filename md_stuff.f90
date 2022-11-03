@@ -49,5 +49,25 @@ MODULE MD_STUFF
         END SUBROUTINE get_box_parameters
         
 !******************************************************************************!
+        REAL(8) FUNCTION dist_PBC(coord_a, coord_b, cell_size) RESULT(res)
+                IMPLICIT NONE
+                REAL(8), INTENT(IN) :: coord_a
+                REAL(8), INTENT(IN) :: coord_b
+                REAL(8), INTENT(IN) :: cell_size
+ 
+                INTEGER :: i
+                REAL(8) :: dxcf, halfboxxrec
+ 
+                halfboxxrec = 2.0/cell_size
+ 
+                dxcf = coord_b - coord_a
+ 
+                ! minimal distance convenction
+                dxcf = dxcf - cell_size*int(dxcf*halfboxxrec)
 
+                res=dxcf
+        END FUNCTION dist_PBC
+
+!******************************************************************************!
+        
 END MODULE MD_STUFF
