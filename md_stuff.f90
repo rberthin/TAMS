@@ -72,22 +72,19 @@ MODULE MD_STUFF
         IMPLICIT NONE
         INTEGER, INTENT(IN) ::num_file
         INTEGER :: io
-        CHARACTER*200 :: inputline
+        CHARACTER*2 :: inputline
         INTEGER :: n_lin
-        n_lin=0
+        n_lin = 0
         DO
-           READ(num_file,*,IOSTAT=io)  inputline
-           IF (io > 0) THEN
-              WRITE(*,*) 'Check input.  Something was wrong'
-              EXIT
-           ELSE IF (io < 0) THEN
+           READ(num_file,*,IOSTAT=io) inputline
+           IF (io /= 0) THEN
               EXIT
            ELSE
               n_lin = n_lin + 1
            ENDIF
         ENDDO
         REWIND(num_file)
-        res=n_lin
+        res = n_lin
         END FUNCTION num_lines_file
 
 !******************************************************************************!

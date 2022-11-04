@@ -8,9 +8,9 @@ PROGRAM TAMS
         INTEGER :: n_atoms, n_step
 
         INTEGER :: io, i, j, s
-        INTEGER :: xyz_unit = 10, n_line
+        INTEGER :: xyz_unit = 10, n_line, rdf3_dr
         REAL :: boxx, boxy, boxz, n_steps
-        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: boundy
+        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: boundy
         DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: POS
         
         CHARACTER(LEN = 10), ALLOCATABLE, DIMENSION(:) :: ATOM_NAME
@@ -18,7 +18,7 @@ PROGRAM TAMS
         !--------------------------!
         WRITE(*,*) 'Number of atoms ?'
         READ(*,*) n_atoms
-        WRITE(*,*) 'Name of XYZ trajectorie ?'
+        WRITE(*,*) 'Name of the XYZ trajectorie ?'
         READ(*,*) xyz_filename
 
         OPEN(unit = xyz_unit, file = xyz_filename, status='old', iostat=io)
@@ -29,8 +29,8 @@ PROGRAM TAMS
         ALLOCATE(POS(n_atoms, 3))
         ALLOCATE(ATOM_NAME(n_atoms))
 
-        ! Getting the box parameters
-        call get_box_parameters(boxx, boxy, boxz)
+        ! Getting the box parameters infos
+        CALL get_box_parameters(boxx, boxy, boxz)
 
         !** READ 1 STEP OF THE XYZ TRAJ **!
         !---------------------------------!
@@ -38,14 +38,19 @@ PROGRAM TAMS
 
         !** RDF 3D STUFF **!
         !------------------!
-        CALL get_infos_rdf3d(ATOM_NAME, n_atoms)
-        boundy = RDF3D(POS, n_atoms, boxx, boxy, boxz)
-        DO s = 1, int(n_steps-1)
-                WRITE(*,*) s
-                CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
-                write(*,*) 'done read'
-                boundy = RDF3D(POS, n_atoms, boxx, boxy, boxz)
-        END DO
+        CALL get_infos_rdf3d(ATOM_NAME, n_atoms, rdf3_dr)
+        REWIND(10)
+        ALLOCATE(boundy(rdf3_dr, 2))
+        boundy = RDF3D(int(n_steps), rdf3_dr, xyz_unit, ATOM_NAME, POS, n_atoms, boxx, boxy, boxz)
+        OPEN(unit = 11, file = 'rdf.dat')
+        DO i = 1, rdf3_dr
+                write(11,*) boundy(i,1), boundy(i,2)
+        end do
+        !DO s = 1, int(n_steps-1)
+        !        WRITE(*,*) s
+        !        CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
+        !        boundy = RDF3D(rdf3_dr, POS, n_atoms, boxx, boxy, boxz)
+        !END DO
             
 END PROGRAM TAMS
 
