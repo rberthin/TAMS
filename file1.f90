@@ -7,10 +7,10 @@ PROGRAM TAMS
         !--------------------------!
         INTEGER :: n_atoms, n_step
 
-        INTEGER :: io, i, j, s
+        INTEGER :: io, i, j, s, function_choice
         INTEGER :: xyz_unit = 10, n_line, rdf3_dr
         REAL :: boxx, boxy, boxz, n_steps
-        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: boundy
+        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: res_rdf3d
         DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: POS
         
         CHARACTER(LEN = 10), ALLOCATABLE, DIMENSION(:) :: ATOM_NAME
@@ -32,26 +32,30 @@ PROGRAM TAMS
         ! Getting the box parameters infos
         CALL get_box_parameters(boxx, boxy, boxz)
 
-        !** READ 1 STEP OF THE XYZ TRAJ **!
-        !---------------------------------!
-        CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
+        WRITE(*,*) 'Which function do you want to compute ?'
+        WRITE(*,*) 'Please, choose a number between 1 and 1'
+        WRITE(*,*) '---------------------------------------'
+        WRITE(*,*) '1- Radial distribution function (RDF)'
+        READ(5,*) function_choice
+        IF (function_choice == 1) THEN
 
-        !** RDF 3D STUFF **!
-        !------------------!
-        CALL get_infos_rdf3d(ATOM_NAME, n_atoms, rdf3_dr)
-        REWIND(10)
+                !** READ 1 STEP OF THE XYZ TRAJ **!
+                !---------------------------------!
+                CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
 
-        ALLOCATE(boundy(rdf3_dr, 2))
-        boundy = RDF3D(int(n_steps), rdf3_dr, xyz_unit, ATOM_NAME, POS, n_atoms, boxx, boxy, boxz)
-        OPEN(unit = 11, file = 'rdf.dat')
-        DO i = 1, rdf3_dr
-                write(11,*) boundy(i,1), boundy(i,2)
-        end do
-        !DO s = 1, int(n_steps-1)
-        !        WRITE(*,*) s
-        !        CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
-        !        boundy = RDF3D(rdf3_dr, POS, n_atoms, boxx, boxy, boxz)
-        !END DO
-            
+                !** RDF 3D STUFF **!
+                !------------------!
+                CALL get_infos_rdf(ATOM_NAME, n_atoms, rdf3_dr)
+                REWIND(10)
+
+                ALLOCATE(res_rdf3d(rdf3_dr, 2))
+                res_rdf3d = RDF3D(int(n_steps), rdf3_dr, xyz_unit, ATOM_NAME, &
+                                  POS, n_atoms, boxx, boxy, boxz)
+
+                OPEN(UNIT = 11, FILE = 'rdf.dat')
+                DO i = 1, rdf3_dr
+                        WRITE(11,*) res_rdf3d(i,1), res_rdf3d(i,2)
+                END DO
+        END IF            
 END PROGRAM TAMS
 

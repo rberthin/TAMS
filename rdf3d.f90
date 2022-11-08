@@ -7,56 +7,89 @@ MODULE RDF_3D
         CONTAINS
 
 !******************************************************************************!
-        SUBROUTINE get_infos_rdf3d(ATOM_NAME, n_atoms, rdf3_dr)
+        SUBROUTINE get_infos_rdf(ATOM_NAME, n_atoms, rdf_dr)
                 IMPLICIT NONE
 
                 INTEGER, INTENT(IN) :: n_atoms
-                INTEGER :: rdf3_dr
+                INTEGER :: rdf_dr, rdfdim_choice
                 CHARACTER(LEN = 10), DIMENSION(n_atoms), INTENT(IN) :: ATOM_NAME
                
                 INTEGER :: c, i
-                CHARACTER(LEN = 10) :: rdf3_name1, rdf3_name2
+                LOGICAL :: select_dim = .FALSE., select_name1 = .FALSE., select_name2 = .FALSE., select_2d = .FALSE.
+                CHARACTER(LEN = 10) :: rdf_name1, rdf_name2
+                CHARACTER(LEN = 1) :: rdf2d_choice
 
-                WRITE(*,*) 'COMPUTATION OF 3D RDF'
+                DO WHILE (select_dim .EQV. .FALSE.)
+                        WRITE(*,*) 'Do you want to perform 3D RDF (3) or 2D RDF (2)?' 
+                        READ(*,*)  rdfdim_choice
+                        IF (rdfdim_choice == 3) THEN
+                                WRITE(*,*) 'COMPUTATION OF 3D RDF'
+                                select_dim = .TRUE.
+                        ELSE IF (rdfdim_choice == 2) THEN
+                                WRITE(*,*) 'COMPUTATION OF 2D RDF'
+                                select_dim = .TRUE.
+                        ELSE
+                                WRITE(*,*) 'I did not understand your answer (:'
+
+                        END IF
+                END DO
                 WRITE(*,*) '---------------------'
-                WRITE(*,*) 'Name of the reference atom?'
-                READ(*,*) rdf3_name1
-                IF (ANY(ATOM_NAME == rdf3_name1)) THEN
-                        num_ref_atom = COUNT(ATOM_NAME == rdf3_name1)
-                        ALLOCATE(REF_LOC(num_ref_atom))
-                        c = 1
-                        DO i = 1, n_atoms
-                                IF (ATOM_NAME(i) == rdf3_name1) THEN
-                                        REF_LOC(c) = i
-                                        c = c + 1
-                                END IF
-                        END DO
-                        
+                DO WHILE (select_name1 .EQV. .FALSE.)
+                        WRITE(*,*) 'Name of the reference atom?'
+                        READ(*,*) rdf_name1
+                        IF (ANY(ATOM_NAME == rdf_name1)) THEN
+                                select_name1 = .TRUE.
+                                num_ref_atom = COUNT(ATOM_NAME == rdf_name1)
+                                ALLOCATE(REF_LOC(num_ref_atom))
+                                c = 1
+                                DO i = 1, n_atoms
+                                        IF (ATOM_NAME(i) == rdf_name1) THEN
+                                                REF_LOC(c) = i
+                                                c = c + 1
+                                        END IF
+                                END DO
+                        ELSE ; WRITE(*,*) 'I do not know this name, try again! :)'
+                        END IF
+                END DO
+                DO WHILE (select_name2 .EQV. .FALSE.)
                         WRITE(*,*) 'Name of the observed atom?'
-                        READ(*,*) rdf3_name2
-                        IF (ANY(ATOM_NAME == rdf3_name2)) THEN
-                                num_obs_atom = COUNT(ATOM_NAME == rdf3_name2)
+                        READ(*,*) rdf_name2
+                        IF (ANY(ATOM_NAME == rdf_name2)) THEN
+                                select_name2 = .TRUE.
+                                num_obs_atom = COUNT(ATOM_NAME == rdf_name2)
                                 ALLOCATE(OBS_LOC(num_obs_atom))
                                 c = 1
                                 DO i = 1, n_atoms
-                                        IF (ATOM_NAME(i) == rdf3_name2) THEN
+                                        IF (ATOM_NAME(i) == rdf_name2) THEN
                                                 OBS_LOC(c) = i
                                                 c = c + 1
                                         END IF
                                 END DO
-                                WRITE(*,*) 'Number of bins?'
-                                READ(*,*) rdf3_dr
                         ELSE ; WRITE(*,*) 'I do not know this name, try again! :)'
                         END IF
-                ELSE ; WRITE(*,*) 'I do not know this name, try again! :)'
-                END IF
+                END DO
+
+                WRITE(*,*) 'Number of bins?'
+                READ(*,*) rdf_dr
+                DO WHILE (select_2d .EQV. .FALSE.)
+                        IF (rdfdim_choice == 2) THEN
+                                select_2d = .TRUE.
+                                WRITE(*,*) 'In which dimension do you want to compute the 2D RDF (x, y, z)?'
+                                READ(*,*) rdf2d_choice
+                        ELSE IF (rdfdim_choice == 3) THEN
+                                SELECT_2D = .TRUE.
+                                rdf2d_choice = 'n'
+                        ELSE
+                                WRITE(*,*) 'I did not understand your answer (:'
+                        END IF
+                END DO
 
                 WRITE(*,*) ' Enter the value of r_min :'
                 READ(*,*) r_min
                 WRITE(*,*) ' Enter the value of r_max :'
                 READ(*,*) r_max
 
-        END SUBROUTINE get_infos_rdf3d
+        END SUBROUTINE get_infos_rdf
 
 !******************************************************************************!
         FUNCTION RDF3D(n_steps, rdf3_dr, xyz_unit, ATOM_NAME, init_pos, n_atoms, boxx, boxy, boxz) RESULT(res) 
