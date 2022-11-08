@@ -54,7 +54,7 @@ PROGRAM TAMS
 
                 OPEN(UNIT = 11, FILE = 'rdf.dat')
                 DO i = 1, rdf3_dr
-                        WRITE(11,*) res_rdf3d(i,1), res_rdf3d(i,2)
+                        WRITE(11,'(F10.5, F12.8)') res_rdf3d(i,1), res_rdf3d(i,2)
                 END DO
         END IF            
 END PROGRAM TAMS
