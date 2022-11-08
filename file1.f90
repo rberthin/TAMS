@@ -40,6 +40,7 @@ PROGRAM TAMS
         !------------------!
         CALL get_infos_rdf3d(ATOM_NAME, n_atoms, rdf3_dr)
         REWIND(10)
+
         ALLOCATE(boundy(rdf3_dr, 2))
         boundy = RDF3D(int(n_steps), rdf3_dr, xyz_unit, ATOM_NAME, POS, n_atoms, boxx, boxy, boxz)
         OPEN(unit = 11, file = 'rdf.dat')
