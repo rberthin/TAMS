@@ -20,7 +20,7 @@ MODULE RDF_3D
                 INTEGER :: c, i
                 LOGICAL :: select_dim = .FALSE., select_name1 = .FALSE., select_name2 = .FALSE., select_2d = .FALSE.
                 CHARACTER(LEN = 10) :: rdf_name1, rdf_name2
-                !CHARACTER(LEN = 1) :: rdf2d_choice
+                CHARACTER(LEN = 1) :: tempdev_choice
 
                 DO WHILE (select_dim .EQV. .FALSE.)
                         WRITE(*,*) 'Do you want to perform 3D RDF (3) or 2D RDF (2)?' 
@@ -87,11 +87,15 @@ MODULE RDF_3D
                         END IF
                 END DO
 
-                WRITE(*,*) ' Enter the value of r_min :'
+                WRITE(*,*) 'Enter the value of r_min :'
                 READ(*,*) r_min
-                WRITE(*,*) ' Enter the value of r_max :'
+                WRITE(*,*) 'Enter the value of r_max :'
                 READ(*,*) r_max
 
+                WRITE(*,*) 'Do you want to save a temporal development of this rdf (y/n)?'
+                READ(*,*) tempdev_choice
+                !IF (tempdev_choice == 'y') THEN
+                !        WRITE(*,*) 'Do you want to save it for all the 
         END SUBROUTINE get_infos_rdf
 
 !******************************************************************************!

@@ -14,14 +14,18 @@ PROGRAM TAMS
         DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: POS
         
         CHARACTER(LEN = 10), ALLOCATABLE, DIMENSION(:) :: ATOM_NAME
-        CHARACTER(LEN = 30) :: xyz_filename
+        CHARACTER(LEN = 30) :: xyz_filename, input_name = 'tams_input.dat'
         !--------------------------!
-        WRITE(*,*) 'Number of atoms ?'
-        READ(*,*) n_atoms
+        ! TO DO
+        ! ADD POSSIBILITY TO OPEN TAMS_INPUT.DAT
+
         WRITE(*,*) 'Name of the XYZ trajectorie ?'
         READ(*,*) xyz_filename
 
         OPEN(unit = xyz_unit, file = xyz_filename, status='old', iostat=io)
+        READ(10,*) n_atoms
+        REWIND(10)
+        WRITE(*,*) n_atoms, 'atoms found'
         n_line = num_lines_file(xyz_unit)
         n_steps = (n_line - 2) / n_atoms
         WRITE(*,*) int(n_steps), 'steps found'
@@ -34,8 +38,10 @@ PROGRAM TAMS
 
         WRITE(*,*) 'Which function do you want to compute ?'
         WRITE(*,*) 'Please, choose a number between 1 and 1'
+        WRITE(*,*) '-------- Available functions ----------'
         WRITE(*,*) '---------------------------------------'
         WRITE(*,*) '1- Radial distribution function (RDF)'
+        WRITE(*,*) '---------------------------------------'
         READ(5,*) function_choice
         IF (function_choice == 1) THEN
 
