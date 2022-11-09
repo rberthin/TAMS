@@ -1,7 +1,10 @@
 PROGRAM TAMS
 
         USE MD_STUFF
+        USE MOLECULAR_RECOGNITION
         USE RDF_3D
+        USE covalent_radius
+        USE lexical_sort
         IMPLICIT NONE
         !** VARIABLE DECLARATION **!
         !--------------------------!
@@ -21,14 +24,16 @@ PROGRAM TAMS
 
         WRITE(*,*) 'Name of the XYZ trajectorie ?'
         READ(*,*) xyz_filename
-
+        
         OPEN(unit = xyz_unit, file = xyz_filename, status='old', iostat=io)
-        READ(10,*) n_atoms
-        REWIND(10)
+        READ(xyz_unit,*) n_atoms
+        REWIND(xyz_unit)
         WRITE(*,*) n_atoms, 'atoms found'
         n_line = num_lines_file(xyz_unit)
         n_steps = (n_line - 2) / n_atoms
         WRITE(*,*) int(n_steps), 'steps found'
+        
+        CALL SORT_ATOM_NAME(xyz_unit, xyz_filename, n_atoms)
 
         ALLOCATE(POS(n_atoms, 3))
         ALLOCATE(ATOM_NAME(n_atoms))
