@@ -5,25 +5,25 @@ MODULE MOLECULAR_RECOGNITION
         USE LEXICAL_SORT
 
         CONTAINS
-        SUBROUTINE SORT_ATOM_NAME(xyz_unit, xyz_filename, n_atoms)       
+        SUBROUTINE SORT_ATOM_NAME() !xyz_unit, xyz_filename, n_atoms)       
                 IMPLICIT NONE
                 INTEGER :: i, io, c, m, counter_same_name 
-                INTEGER, INTENT(IN) :: xyz_unit, n_atoms
-                DOUBLE PRECISION, DIMENSION(n_atoms,3) :: POS
-                CHARACTER(LEN = 10), DIMENSION(n_atoms) :: ATOM_NAME
+                !INTEGER, INTENT(IN) :: xyz_unit, n_atoms
+                !DOUBLE PRECISION, DIMENSION(n_atoms,3) :: POS
+                !CHARACTER(LEN = 10), DIMENSION(n_atoms) :: ATOM_NAME
                 CHARACTER(LEN = 10), ALLOCATABLE, DIMENSION(:) :: ATOM_N, TEMP_ARRAY, ATOM_TYPE
                 INTEGER, ALLOCATABLE, DIMENSION(:) :: ATOM_INDEX, COUNT_NAME, TMP_ARRAY
                 INTEGER, DIMENSION(n_elem) :: COUNT_TYPE
                 CHARACTER(LEN = 1) :: answer
-                CHARACTER(LEN = 30), INTENT(IN) :: xyz_filename
+                !CHARACTER(LEN = 30), INTENT(IN) :: xyz_filename
                 CALL init_periodic_table()
 
         OPEN(unit = xyz_unit, file = xyz_filename, status='old', iostat=io)
         ALLOCATE(ATOM_INDEX(n_atoms))
-
+        write(*,*) 'coucou 0'
         ! Read one step to get the atom name       
-        CALL read_xyz(xyz_unit, n_atoms, ATOM_NAME, POS)
-
+        CALL read_xyz() !xyz_unit, n_atoms, ATOM_NAME, POS)
+        write(*,*) 'coucou'
         ! Sort all the atom name 
         CALL sort(ATOM_NAME, ATOM_INDEX)
 

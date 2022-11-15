@@ -99,13 +99,13 @@ MODULE RDF_3D
         END SUBROUTINE get_infos_rdf
 
 !******************************************************************************!
-        FUNCTION RDF3D(n_steps, rdf_dr, xyz_unit, ATOM_NAME, init_pos, n_atoms, boxx, boxy, boxz) RESULT(res) 
+        FUNCTION RDF3D(n_steps, rdf_dr, ATOM_NAME, init_pos, n_atoms, boxx, boxy, boxz) RESULT(res) 
         
                 USE MD_STUFF
                 !https://physics.emory.edu/faculty/weeks/idl/gofr2.html
         
                 IMPLICIT NONE
-                INTEGER :: i, j, k, s, rdf_dr, n_steps, xyz_unit
+                INTEGER :: i, j, k, s, rdf_dr, n_steps
                 INTEGER, INTENT(IN) :: n_atoms
                 REAL :: boxx, boxy, boxz
                 LOGICAL :: find
