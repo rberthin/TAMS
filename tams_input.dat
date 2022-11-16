@@ -4,3 +4,17 @@
  y    
  What is the box length?
    54.0000000    
+ Which function do you want to compute ?
+           1
+ Do you want to perform 3D RDF (3) or 2D RDF (2)?
+3
+ Name of the reference atom?
+ CR1       
+ Name of the observed atom?
+ NC1       
+ Number of bins?
+        1000
+ Enter the value of r_min :
+   0.00000000    
+ Enter the value of r_max :
+   25.0000000    
