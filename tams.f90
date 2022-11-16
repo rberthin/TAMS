@@ -10,7 +10,7 @@ PROGRAM TAMS
         IMPLICIT NONE
         !** VARIABLE DECLARATION **!
         !--------------------------!
-        INTEGER :: i, j, s
+        !INTEGER :: i, j, s
         !--------------------------!
         
         CALL get_traj_name()
@@ -25,6 +25,7 @@ PROGRAM TAMS
         CALL get_box_parameters() !boxx, boxy, boxz)
 
         CALL choose_function()
-
+        CLOSE(xyz_unit)
+        CLOSE(tamsinput_unit)
 END PROGRAM TAMS
 

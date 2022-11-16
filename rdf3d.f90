@@ -3,7 +3,7 @@ MODULE RDF_3D
         IMPLICIT NONE
         DOUBLE PRECISION, PARAMETER :: pi  = 4*atan(1.0)
         INTEGER :: num_ref_atom, num_obs_atom, rdfdim_choice
-        INTEGER, PUBLIC :: rdf_dr
+        INTEGER :: rdf_dr
         REAL :: r_max, r_min
 
         DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: bound, in_bound
@@ -29,20 +29,20 @@ MODULE RDF_3D
                         READ(tamsinput_unit,*) crap
                         READ(tamsinput_unit,*) rdfdim_choice
                         IF (rdfdim_choice == 3) THEN
-                                WRITE(*,*) 'COMPUTATION OF 3D RDF'
+                                WRITE(*,*) '* COMPUTATION OF 3D RDF'
                                 select_dim = .TRUE.
                         ELSE IF (rdfdim_choice == 2) THEN
                                 READ(tamsinput_unit,*) crap 
                                 READ(tamsinput_unit,*) rdf2d_choice
-                                WRITE(*,*) 'COMPUTATION OF 2D RDF'
+                                WRITE(*,*) '* COMPUTATION OF 2D RDF'
                                 select_dim = .TRUE.
                         END IF
                 ELSE
                         DO WHILE (select_dim .EQV. .FALSE.)
                                 WRITE(*,*) 'Do you want to perform 3D RDF (3) or 2D RDF (2)?'
-                                WRITE(tamsinput_unit,*) 'Do you want to perform 3D RDF (3) or 2D RDF (2)?' 
+                                WRITE(tamsinput_unit,'(A)') 'Do you want to perform 3D RDF (3) or 2D RDF (2)?' 
                                 READ(*,*)  rdfdim_choice
-                                WRITE(tamsinput_unit,'(I2.1)') rdfdim_choice
+                                WRITE(tamsinput_unit,'(I0)') rdfdim_choice
                                 IF (rdfdim_choice == 3) THEN
                                         WRITE(*,*) 'COMPUTATION OF 3D RDF'
                                         select_dim = .TRUE.
@@ -59,7 +59,7 @@ MODULE RDF_3D
                         END DO
                 END IF
 
-                WRITE(*,*) '---------------------'
+                WRITE(*,*) '------------------------'
 
                 IF (file_input .EQV. .TRUE.) THEN
                         READ(tamsinput_unit,*) crap
@@ -67,10 +67,10 @@ MODULE RDF_3D
                 ELSE
                         DO WHILE (select_name1 .EQV. .FALSE.)
                                 WRITE(*,*) 'Name of the reference atom?'
-                                WRITE(tamsinput_unit,*) 'Name of the reference atom?'
+                                WRITE(tamsinput_unit,'(A)') 'Name of the reference atom?'
                                 READ(*,*) rdf_name1
                                 IF (ANY(ATOM_NAME == rdf_name1)) THEN
-                                        WRITE(tamsinput_unit,*) rdf_name1
+                                        WRITE(tamsinput_unit,'(A)') rdf_name1
                                         select_name1 = .TRUE.
                                 ELSE ; WRITE(*,*) 'I do not know this name, try again! :)'
                                 END IF
@@ -93,10 +93,10 @@ MODULE RDF_3D
                 ELSE
                         DO WHILE (select_name2 .EQV. .FALSE.)
                                 WRITE(*,*) 'Name of the observed atom?'
-                                WRITE(tamsinput_unit,*) 'Name of the observed atom?'
+                                WRITE(tamsinput_unit,'(A)') 'Name of the observed atom?'
                                 READ(*,*) rdf_name2
                                 IF (ANY(ATOM_NAME == rdf_name2)) THEN
-                                        WRITE(tamsinput_unit,*) rdf_name2
+                                        WRITE(tamsinput_unit,'(A)') rdf_name2
                                         select_name2 = .TRUE.
                                 ELSE ; WRITE(*,*) 'I do not know this name, try again! :)'
                                 END IF
@@ -122,41 +122,42 @@ MODULE RDF_3D
                         READ(tamsinput_unit,*) r_max
                 ELSE
                         WRITE(*,*) 'Number of bins?'
-                        WRITE(tamsinput_unit,*) 'Number of bins?'
+                        WRITE(tamsinput_unit,'(A)') 'Number of bins?'
                         READ(*,*) rdf_dr
-                        WRITE(tamsinput_unit,*) rdf_dr
+                        WRITE(tamsinput_unit,'(I0)') rdf_dr
                         WRITE(*,*) 'Enter the value of r_min :'
-                        WRITE(tamsinput_unit,*) 'Enter the value of r_min :'
+                        WRITE(tamsinput_unit,'(A)') 'Enter the value of r_min :'
                         READ(*,*) r_min
-                        WRITE(tamsinput_unit,*) r_min
+                        WRITE(tamsinput_unit,'(F0.6)') r_min
                         WRITE(*,*) 'Enter the value of r_max :'
-                        WRITE(tamsinput_unit,*) 'Enter the value of r_max :'
+                        WRITE(tamsinput_unit,'(A)') 'Enter the value of r_max :'
                         READ(*,*) r_max
-                        WRITE(tamsinput_unit,*) r_max
+                        WRITE(tamsinput_unit,'(F0.6)') r_max
                 END IF
-
-                ALLOCATE(bound(rdf_dr))
+                ALLOCATE(bound(rdf_dr+1))
                 ALLOCATE(in_bound(rdf_dr))
                 ALLOCATE(res(rdf_dr, 2))
 
-                WRITE(*,*) 'Do you want to save a temporal development of this rdf (y/n)?'
-                READ(*,*) tempdev_choice
+                !WRITE(*,*) 'Do you want to save a temporal development of this rdf (y/n)?'
+                !READ(*,*) tempdev_choice
 
                 ! Continue temporal development part
                 !IF (tempdev_choice == 'y') THEN
-                !        WRITE(*,*) 'Do you want to save it for all the 
+                !        WRITE(*,*) 'Do you want to save it for all the
+               WRITE(*,*) '------------------------'
+               WRITE(*,*) 'BEGIN 3D RDF COMPUTATION' 
         END SUBROUTINE get_infos_rdf
 
 !******************************************************************************!
-        SUBROUTINE RDF3D() !RESULT(res) !RDF3D(rdf_dr, init_pos) 
+        SUBROUTINE RDF3D() 
         
                 !https://physics.emory.edu/faculty/weeks/idl/gofr2.html
         
                 IMPLICIT NONE
-                INTEGER :: i, j, k, s, rdf_dr
+                INTEGER :: i, j, k, s
                 LOGICAL :: find
                 DOUBLE PRECISION :: X, Y, Z, d_ref_obs
-
+                !write(*,*) rdf_dr
                 !** Definition of each bin **!
                 !----------------------------!
                 bound(1) = r_min
@@ -210,11 +211,11 @@ MODULE RDF_3D
                         in_bound(k) = in_bound(k) / num_ref_atom
                         if (bound(k)/= 0) then
                                 in_bound(k) = in_bound(k) / (4 * pi * bound(k)**2 * ((r_max - r_min)/rdf_dr) )
-                                                        end if
+                        end if
                         in_bound(k) = in_bound(k) / (num_obs_atom/(boxx*boxy*boxz))
 
                         res(k, 1) = bound(k)
-                        write(*,*) bound(k)
+               !         write(*,*) bound(k)
                         res(k, 2) = in_bound(k)
                         WRITE(11,'(F10.5, F12.8)') res(k, 1), res(k, 2)
                 END DO

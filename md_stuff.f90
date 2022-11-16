@@ -26,9 +26,9 @@ MODULE MD_STUFF
                 ELSE
                         OPEN(unit = tamsinput_unit, file = input_name)
                         WRITE(*,*) 'Name of the XYZ trajectorie ?'
-                        WRITE(tamsinput_unit,*) 'Name of the XYZ trajectorie ?'
+                        WRITE(tamsinput_unit,'(A)') 'Name of the XYZ trajectorie ?'
                         READ(*,*) xyz_filename
-                        WRITE(tamsinput_unit,*) xyz_filename
+                        WRITE(tamsinput_unit,'(A)') xyz_filename
                 END IF
 
         END SUBROUTINE get_traj_name
@@ -92,30 +92,30 @@ MODULE MD_STUFF
                 ELSE
                         DO WHILE(step_while)
                         WRITE(*,*) 'Is the simulation box cubic (y/n)?'
-                        WRITE(tamsinput_unit,*) 'Is the simulation box cubic (y/n)?'
+                        WRITE(tamsinput_unit,'(A)') 'Is the simulation box cubic (y/n)?'
                         READ(*,*) answer
-                        WRITE(tamsinput_unit,*) answer
+                        WRITE(tamsinput_unit,'(A)') answer
                         IF (answer == 'y') THEN
                                 WRITE(*,*) 'What is the box length?'
-                                WRITE(tamsinput_unit,*) 'What is the box length?'
+                                WRITE(tamsinput_unit,'(A)') 'What is the box length?'
                                 READ(*,*) boxx
-                                WRITE(tamsinput_unit,*) boxx
+                                WRITE(tamsinput_unit,'(F0.6)') boxx
                                 boxy = boxx
                                 boxz = boxx
                                 step_while = .FALSE.
                         ELSE IF (answer == 'n') THEN
                                 WRITE(*,*) 'What is the box length along x?'
-                                WRITE(tamsinput_unit,*) 'What is the box length along x?'
+                                WRITE(tamsinput_unit,'(A)') 'What is the box length along x?'
                                 READ(*,*) boxx
-                                WRITE(tamsinput_unit,*) boxx
+                                WRITE(tamsinput_unit,'(F0.6)') boxx
                                 WRITE(*,*) 'What is the box length along y?'
-                                WRITE(tamsinput_unit,*) 'What is the box length along y?'
+                                WRITE(tamsinput_unit,'(A)') 'What is the box length along y?'
                                 READ(*,*) boxy
-                                WRITE(tamsinput_unit,*) boxy
+                                WRITE(tamsinput_unit,'(F0.6)') boxy
                                 WRITE(*,*) 'What is the box length along z?'
-                                WRITE(tamsinput_unit,*) 'What is the box length along z?'
+                                WRITE(tamsinput_unit,'(A)') 'What is the box length along z?'
                                 READ(*,*) boxz
-                                WRITE(tamsinput_unit,*) boxz
+                                WRITE(tamsinput_unit,'(F0.6)') boxz
                                 step_while = .FALSE.
                         ELSE
                                 WRITE(*,*) 'Something went wrong, try again :)'
@@ -131,7 +131,6 @@ MODULE MD_STUFF
                 DOUBLE PRECISION, INTENT(IN) :: coord_a, coord_b
                 REAL, INTENT(IN) :: cell_size
  
-                INTEGER :: i
                 REAL(8) :: dxcf, halfboxxrec
  
                 halfboxxrec = 2.0/cell_size
