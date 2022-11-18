@@ -68,7 +68,7 @@ MODULE MD_STUFF
         SUBROUTINE get_box_parameters()
                 IMPLICIT NONE
                 LOGICAL :: step_while = .TRUE. ! , file_input
-                REAL :: boxx, boxy, boxz
+                !REAL :: boxx, boxy, boxz
                 CHARACTER(LEN = 5) answer
                 CHARACTER(LEN = 100) crap
 

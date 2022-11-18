@@ -1,18 +1,19 @@
 MODULE RDF_3D
         USE MD_STUFF
+
         IMPLICIT NONE
         DOUBLE PRECISION, PARAMETER :: pi  = 4*atan(1.0)
+        !REAL :: boxx, boxy, boxz
         INTEGER :: num_ref_atom, num_obs_atom, rdfdim_choice
         INTEGER :: rdf_dr
         REAL :: r_max, r_min
 
         DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: bound, in_bound
-        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: res
-        !DOUBLE PRECISION, DIMENSION(n_atoms,3) :: init_pos
 
         INTEGER, ALLOCATABLE, DIMENSION(:) :: REF_LOC
         INTEGER, ALLOCATABLE, DIMENSION(:) :: OBS_LOC
         CHARACTER(LEN = 1) :: rdf2d_choice
+
         CONTAINS
 
 !******************************************************************************!
@@ -31,6 +32,7 @@ MODULE RDF_3D
                         IF (rdfdim_choice == 3) THEN
                                 WRITE(*,*) '* COMPUTATION OF 3D RDF'
                                 select_dim = .TRUE.
+                                rdf2d_choice = 'n'
                         ELSE IF (rdfdim_choice == 2) THEN
                                 READ(tamsinput_unit,*) crap 
                                 READ(tamsinput_unit,*) rdf2d_choice
@@ -136,7 +138,6 @@ MODULE RDF_3D
                 END IF
                 ALLOCATE(bound(rdf_dr+1))
                 ALLOCATE(in_bound(rdf_dr))
-                ALLOCATE(res(rdf_dr, 2))
 
                 !WRITE(*,*) 'Do you want to save a temporal development of this rdf (y/n)?'
                 !READ(*,*) tempdev_choice
@@ -155,19 +156,23 @@ MODULE RDF_3D
         
                 IMPLICIT NONE
                 INTEGER :: i, j, k, s
-                LOGICAL :: find
-                DOUBLE PRECISION :: X, Y, Z, d_ref_obs
-                !write(*,*) rdf_dr
+                INTEGER :: bin_value
+                DOUBLE PRECISION :: X, Y, Z, d_ref_obs, bin_size
+                
                 !** Definition of each bin **!
                 !----------------------------!
-                bound(1) = r_min
+                bin_size = (r_max - r_min)/rdf_dr
                 DO k = 1, rdf_dr
-                        bound(k+1) = r_min + k*((r_max - r_min)/rdf_dr)
+                        bound(k) = r_min + k*bin_size
                 END DO
                 !----------------------------!
+
+                !*** Initialize the array ***!
+                in_bound = 0
+
+                !** Start looping on steps **!
                 DO s = 1, n_steps
-                        write(*,*) s
-                        CALL read_xyz() !xyz_unit, n_atoms, ATOM_NAME, init_pos)
+                        CALL read_xyz() 
                         DO i = 1, num_ref_atom ! Loop over all the ref. atoms
                                 DO j = 1, num_obs_atom ! Loop over the observed atoms
                                         IF (rdf2d_choice == 'n') THEN
@@ -184,40 +189,34 @@ MODULE RDF_3D
                                                 Y = POS(REF_LOC(i), 2) - POS(OBS_LOC(j), 2)
                                                 Z = dist_PBC(POS(OBS_LOC(j), 3), POS(REF_LOC(i), 3), boxz)
                                         ELSE IF (rdf2d_choice == 'z') THEN
-                                                ! call pbc to change X, Y and Z positions
                                                 X = dist_PBC(POS(OBS_LOC(j), 1), POS(REF_LOC(i), 1), boxx)
                                                 Y = dist_PBC(POS(OBS_LOC(j), 2), POS(REF_LOC(i), 2), boxy)
                                                 Z = POS(REF_LOC(i), 3) - POS(OBS_LOC(j), 3)
                                         END IF
+
                                         ! compute distance ref - obs (with pbc)
                                         d_ref_obs = sqrt( X**2 + Y**2 + Z**2 )
-                                        
+
+                                        ! put the distance in the good bin
                                         IF (d_ref_obs <= r_max) THEN
-                                                find = .TRUE.
-                                                DO k = 1, rdf_dr ! Loop over the bin
-                                                        IF (d_ref_obs <= bound(k) .AND. find) THEN
-                                                                in_bound(k) = in_bound(k) + 1
-                                                                find = .FALSE.   
-                                                        END IF
-                                                END DO
+                                                bin_value = INT(d_ref_obs / bin_size) + 1
+                                                in_bound(bin_value) = in_bound(bin_value) + 1
                                         END IF
         
                                 END DO
                         END DO
                 END DO
-                OPEN(UNIT = 11, FILE = 'rdf.dat')
-                DO k = 1, rdf_dr
-                        in_bound(k) = in_bound(k) / n_steps
-                        in_bound(k) = in_bound(k) / num_ref_atom
-                        if (bound(k)/= 0) then
-                                in_bound(k) = in_bound(k) / (4 * pi * bound(k)**2 * ((r_max - r_min)/rdf_dr) )
-                        end if
-                        in_bound(k) = in_bound(k) / (num_obs_atom/(boxx*boxy*boxz))
 
-                        res(k, 1) = bound(k)
-               !         write(*,*) bound(k)
-                        res(k, 2) = in_bound(k)
-                        WRITE(11,'(F10.5, F12.8)') res(k, 1), res(k, 2)
+                OPEN(UNIT = 11, FILE = 'rdf.dat')
+                !** Read the results **!
+                DO k = 1, rdf_dr
+                        IF (bound(k) /= 0.0) THEN
+                                in_bound(k) = in_bound(k) / n_steps
+                                in_bound(k) = in_bound(k) / num_ref_atom
+                                in_bound(k) = in_bound(k) / (4 * pi * bound(k)**2 * bin_size)
+                                in_bound(k) = in_bound(k) / (num_obs_atom/(boxx*boxy*boxz))
+                        END IF
+                        WRITE(11,'(F10.5, F12.8)') bound(k)-bin_size/2, in_bound(k)
                 END DO
         END SUBROUTINE RDF3D  
 !******************************************************************************!

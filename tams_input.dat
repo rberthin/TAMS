@@ -11,10 +11,10 @@ Do you want to perform 3D RDF (3) or 2D RDF (2)?
 Name of the reference atom?
 CR1       
 Name of the observed atom?
-CR2       
+NC1       
 Number of bins?
 10
 Enter the value of r_min :
 .000000
 Enter the value of r_max :
-25.000000
+10.000000

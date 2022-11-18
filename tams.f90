@@ -22,9 +22,10 @@ PROGRAM TAMS
         CALL SORT_ATOM_NAME()
 
         ! Getting the box parameters infos
-        CALL get_box_parameters() !boxx, boxy, boxz)
+        CALL get_box_parameters() 
 
         CALL choose_function()
+
         CLOSE(xyz_unit)
         CLOSE(tamsinput_unit)
 END PROGRAM TAMS
