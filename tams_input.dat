@@ -1,5 +1,15 @@
 Name of the XYZ trajectorie ?
 trajectories.xyz              
+What is the atom type of EC6       ?
+ C 
+What is the atom type of MC8       ?
+ C 
+What is the atom type of RC2       ?
+ C 
+What is the atom type of RC4       ?
+ C 
+What is the atom type of RC5       ?
+ C 
 Is the simulation box cubic (y/n)?
 y    
 What is the box length?
@@ -11,10 +21,10 @@ Do you want to perform 3D RDF (3) or 2D RDF (2)?
 Name of the reference atom?
 CR1       
 Name of the observed atom?
-NC1       
+CR2       
 Number of bins?
 10
 Enter the value of r_min :
 .000000
 Enter the value of r_max :
-10.000000
+25.000000

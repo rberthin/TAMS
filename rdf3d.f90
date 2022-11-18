@@ -172,6 +172,7 @@ MODULE RDF_3D
 
                 !** Start looping on steps **!
                 DO s = 1, n_steps
+                        !write(*,*) s
                         CALL read_xyz() 
                         DO i = 1, num_ref_atom ! Loop over all the ref. atoms
                                 DO j = 1, num_obs_atom ! Loop over the observed atoms

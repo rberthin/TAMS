@@ -24,10 +24,10 @@ MODULE MD_STUFF
                         READ(tamsinput_unit,*) xyz_filename
 
                 ELSE
-                        OPEN(unit = tamsinput_unit, file = input_name)
+                        OPEN(unit = tamsinput_unit, file = input_name, status='new')
                         WRITE(*,*) 'Name of the XYZ trajectorie ?'
+                        READ(5,*) xyz_filename
                         WRITE(tamsinput_unit,'(A)') 'Name of the XYZ trajectorie ?'
-                        READ(*,*) xyz_filename
                         WRITE(tamsinput_unit,'(A)') xyz_filename
                 END IF
 
@@ -44,14 +44,14 @@ MODULE MD_STUFF
                 REWIND(xyz_unit)
                 WRITE(*,*) n_atoms, 'atoms found'
                 n_line = num_lines_file(xyz_unit)
-                n_steps = (n_line - 2) / n_atoms
+                n_steps = n_line / (n_atoms+2)
                 WRITE(*,*) int(n_steps), 'steps found'
                 ALLOCATE(POS(n_atoms, 3))
                 ALLOCATE(ATOM_NAME(n_atoms))
         END SUBROUTINE get_step_and_natoms
 
 !******************************************************************************!
-        SUBROUTINE read_xyz() !name_array, pos_array)
+        SUBROUTINE read_xyz() 
                 IMPLICIT NONE
                 INTEGER :: i
 
@@ -67,8 +67,7 @@ MODULE MD_STUFF
 !******************************************************************************!
         SUBROUTINE get_box_parameters()
                 IMPLICIT NONE
-                LOGICAL :: step_while = .TRUE. ! , file_input
-                !REAL :: boxx, boxy, boxz
+                LOGICAL :: step_while = .TRUE. 
                 CHARACTER(LEN = 5) answer
                 CHARACTER(LEN = 100) crap
 
